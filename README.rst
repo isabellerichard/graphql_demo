@@ -80,9 +80,9 @@ Test your first resolver:
             "password": "admin",
         },
     }
-    sess.post('http://127.0.0.1:8099/web/session/authenticate', json=data)
+    sess.post('http://localhost:8099/web/session/authenticate', json=data)
     response = sess.get(
-        'http://127.0.0.1:8099/graphql/demo', 
+        'http://localhost:8099/graphql/demo', 
         json={'query': '{ reverse(word: "hello world") }'})
 
     print(response.status_code)
