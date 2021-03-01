@@ -35,12 +35,25 @@ class Partner(OdooObjectType):
         return root.child_ids
 
 
+class OpportunityTag(OdooObjectType):
+    name = graphene.String(required=True)
+    color = graphene.Int()
+
+
 class Opportunity(OdooObjectType):
+    name = graphene.String(required=True)
     contact = graphene.Field(Partner)
+    date_deadline = graphene.DateTime()
+    tags = graphene.List(
+        graphene.NonNull(lambda: OpportunityTag), required=True)
 
     @staticmethod
     def resolve_contact(root, info):
         return root.partner_id or None
+
+    @staticmethod
+    def resolve_tags(root, info):
+        return root.tag_ids
 
 
 class Query(graphene.ObjectType):
@@ -55,6 +68,8 @@ class Query(graphene.ObjectType):
     all_opportunities = graphene.List(
         graphene.NonNull(Opportunity),
         required=True,
+        tag_color=graphene.Int(),
+        only_with_contact=graphene.Boolean(),
         limit=graphene.Int(),
         offset=graphene.Int(),
         description="Get all opportunities and bound contact",
@@ -80,11 +95,16 @@ class Query(graphene.ObjectType):
 
     @staticmethod
     def resolve_all_opportunities(
-            root, info, limit=None, offset=None):
+            root, info, tag_color=None, only_with_contact=False,
+            limit=None, offset=None):
         model = "crm.lead"
         if model not in info.context["env"]:
             raise UserError(_("Please install CRM application!"))
         domain = [('type', '=', 'opportunity')]
+        if tag_color:
+            domain.append(("tag_ids.color", "=", tag_color))
+        if only_with_contact:
+            domain.append(("partner_id", "!=", False))
         return info.context["env"][model].search(
             domain, limit=limit, offset=offset
         )

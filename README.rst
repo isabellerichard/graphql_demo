@@ -23,20 +23,40 @@ Test on GraphiQL
 
 Access to your database on: http://localhost:8099/graphiql/demo
 
-You can now play with queries. Here is an example to get all opportunities
-present in your database, including main information of their contact.
+You can now play with queries. 
+
+Get all opportunities, including main information of their contact:
 
 .. code-block::
 
     {
         allOpportunities {
             contact {
-            street
-            street2
-            city
-            zip
-            email
-            phone
+                street
+                street2
+                city
+                zip
+                email
+                phone
+            }
+        }
+    }
+
+Get all opportunities having a contact and a tag with color `1`:
+
+.. code-block::
+
+    {
+        allOpportunities (tagColor: 1, onlyWithContact: true) {
+            name
+            contact {
+                name
+                email
+            }
+            dateDeadline
+            tags {
+                name
+                color
             }
         }
     }
