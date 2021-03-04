@@ -61,6 +61,20 @@ Get all opportunities having a contact and a tag with color `1`:
         }
     }
 
+Create a new partner:
+
+.. code-block::
+
+    mutation createPartner {
+        createPartner(
+            name: "John DOE", 
+            email: "john.doe@example.com", 
+            isCompany: false
+        ) {
+            name
+        }
+    }
+
 Use Python requests library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -84,6 +98,41 @@ Test your first resolver:
     response = sess.get(
         'http://localhost:8099/graphql/demo', 
         json={'query': '{ reverse(word: "hello world") }'})
+
+    print(response.status_code)
+    print(response.content)
+
+Create a new partner:
+
+.. code-block:: python
+
+    import requests
+
+    sess = requests.session()
+    data = {
+        "jsonrpc": "2.0", 
+        "method": "call", 
+        "params": {
+            "db": "test", 
+            "login": "admin", 
+            "password": "admin",
+        },
+    }
+    sess.post('http://localhost:8099/web/session/authenticate', json=data)
+    data = {
+        'query': """
+            mutation createPartner {
+                createPartner(
+                    name: "John DOE", 
+                    email: "john.doe@example.com", 
+                    isCompany: false
+                ) {
+                    name
+                }
+            }
+        """
+    }
+    response = sess.post('http://localhost:8099/graphql/demo', json=data)
 
     print(response.status_code)
     print(response.content)
